@@ -1,1 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق سلام فون - النسخة الذهبية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght=400;500;700;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes cart-bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        .animate-cart { animation: cart-bounce 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 select-none no-scrollbar overflow-x-hidden pb-24">
+
+    <!-- شريط التنقل العلوي -->
+    <div id="main-nav" class="bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="goBackToHome()">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-600 to-red-800 rounded-xl flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-phone text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-md font-black text-gray-900 leading-tight">سلام فون</h1>
+                    <span class="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded font-bold">إلكترونيات وكروت</span>
+                </div>
+            </div>
+            
+            <div class="relative cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100" onclick="toggleCartPage()">
+                <i id="cart-icon-nav" class="fa-solid fa-bag-shopping text-gray-700 text-lg"></i>
+                <span id="cart-badge" class="bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center absolute -top-1 -left-1 hidden">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- إشعار التنبيه -->
+    <div id="toast-notification" class="fixed top-16 left-4 right-4 bg-gray-900/95 text-white py-3 px-4 rounded-xl shadow-xl flex items-center justify-between z-50 transform translate-y-[-150%] transition-all duration-300 backdrop-blur-sm">
+        <div class="flex items-center gap-2.5">
+            <i class="fa-solid fa-circle-check text-green-400 text-lg"></i>
+            <p id="toast-text" class="text-xs font-bold"></p>
+        </div>
+    </div>
+
+    <!-- الصفحة الرئيسية -->
+    <div id="page-home" class="app-page">
+        <!-- بنر الترحيب الملكي الأحمر -->
+        <div class="container mx-auto px-4 mt-4">
+            <div class="w-full h-44 bg-gradient-to-br from-red-700 via-red-600 to-red-800 rounded-3xl p-5 relative overflow-hidden shadow-xl flex flex-col justify-between">
+                <div class="z-10 max-w-[70%] space-y-1">
+                    <span class="bg-white/20 text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">أهلاً بك في عالمك</span>
+                    <h2 class="text-2xl font-black text-white tracking-tight">متجر سلام فون</h2>
+                    <h3 class="text-xs font-bold text-red-100">أقوى كروت الشحن والأجهزة الذكية</h3>
+                    <p class="text-[10px] text-red-200/90 pt-1">بيع وتعبئة كروت زين العراق وآسيا سيل الفورية المباشرة لزبائننا الكرام!</p>
+                </div>
+                <i class="fa-solid fa-crown absolute left-4 text-8xl opacity-10 text-white bottom-2 rotate-12"></i>
+            </div>
+        </div>
+
+        <!-- أزرار الفلترة والتصنيفات -->
+        <div class="container mx-auto px-4 mt-5">
+            <div id="brands-bar" class="flex gap-2.5 overflow-x-auto no-scrollbar py-2">
+                <button onclick="filterBrand('all', this)" class="brand-btn active bg-red-600 text-white border border-red-600 px-5 py-2 rounded-xl text-xs font-bold shadow-md whitespace-nowrap transition-all">الكل</button>
+                <button onclick="filterBrand('cards', this)" class="brand-btn bg-white text-gray-600 border border-gray-100 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5"><i class="fa-solid fa-credit-card text-blue-500"></i> كروت شحن</button>
+                <button onclick="filterBrand('apple', this)" class="brand-btn bg-white text-gray-600 border border-gray-100 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5"><i class="fa-brands fa-apple text-black"></i> آيفون</button>
+                <button onclick="filterBrand('samsung', this)" class="brand-btn bg-white text-gray-600 border border-gray-100 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen text-blue-600"></i> سامسونج</button>
+            </div>
+        </div>
+
+        <!-- المنتجات -->
+        <div class="container mx-auto px-4 mt-6">
+            <h3 class="text-sm font-bold text-gray-900 border-r-4 border-red-600 pr-2 mb-4">أحدث العروض المتوفرة</h3>
+            <div id="products-grid" class="grid grid-cols-2 gap-3.5">
+                <!-- توليد المنتجات برمجياً -->
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة السلة -->
+    <div id="page-cart" class="app-page hidden container mx-auto px-4 mt-4">
+        <div class="flex items-center gap-2 mb-4">
+            <button onclick="goBackToHome()" class="w-8 h-8 bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-sm text-gray-700">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+            <h3 class="text-sm font-bold text-gray-900">سلة المشتريات</h3>
+        </div>
+
+        <div id="cart-items-container" class="space-y-3">
+            <!-- عناصر السلة -->
+        </div>
+
+        <!-- إرسال الطلب النهائي -->
+        <div id="cart-summary-card" class="bg-white border border-gray-100 rounded-2xl p-4 mt-6 shadow-sm space-y-4 hidden">
+            <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+                <span class="text-xs text-gray-500 font-medium">المجموع الكلي:</span>
+                <span id="cart-total-price" class="text-base font-black text-red-600">0 د.ع</span>
+            </div>
+            
+            <div class="space-y-2.5">
+                <label class="text-[11px] font-bold text-gray-500 block">معلومات التوصيل أو الاستلام:</label>
+                <input type="text" id="customer-name" placeholder="اسمك الكريم" class="w-full bg-gray-50 border border-gray-100 text-xs px-3 py-2.5 rounded-xl focus:outline-none focus:border-red-500 font-medium">
+                <input type="text" id="customer-address" placeholder="عنوان السكن أو المنطقة" class="w-full bg-gray-50 border border-gray-100 text-xs px-3 py-2.5 rounded-xl focus:outline-none focus:border-red-500 font-medium">
+            </div>
+
+            <button onclick="sendOrderWhatsApp()" class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all mt-2">
+                <i class="fa-brands fa-whatsapp text-base"></i>
+                إرسال الطلب عبر الواتساب
+            </button>
+        </div>
+
+        <div id="cart-empty-state" class="text-center py-16 space-y-3">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                <i class="fa-solid fa-basket-shopping text-2xl"></i>
+            </div>
+            <p class="text-xs text-gray-400 font-medium">سلتك فارغة تماماً!</p>
+            <button onclick="goBackToHome()" class="text-xs font-bold text-red-600 bg-red-50 px-4 py-2 rounded-xl mt-2">ابدأ التسوق الآن</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "كارت شحن زين العراق (10,000 د.ع)", price: 10000, image: "https://images.unsplash.com/photo-1580828343064-fde4fc206bc6?auto=format&fit=crop&w=300&q=80", brand: "cards", desc: "كارت تعبئة رصيد خطوط زين الصافي المباشر." },
+            { id: 2, name: "كارت شحن آسيا سيل (10,000 د.ع)", price: 10000, image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=300&q=80", brand: "cards", desc: "كارت شحن رصيد آسيا سيل الأصلي الفوري لخطك الذكي." },
+            { id: 3, name: "iPhone 15 Pro Max (256 GB)", price: 1450000, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=300&q=80", brand: "apple", desc: "التيتانيوم الفاخر بأقوى أداء كاميرات وبطارية ممتازة." },
+            { id: 4, name: "Samsung Galaxy S24 Ultra", price: 1390000, image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=300&q=80", brand: "samsung", desc: "ملك الذكاء الاصطناعي ومستشعر التصوير العملاق." },
+            { id: 5, name: "سماعات Apple AirPods Pro 2", price: 290000, image: "https://images.unsplash.com/photo-1588449668338-d1517ce31a44?auto=format&fit=crop&w=300&q=80", brand: "apple", desc: "عزل صوتي كامل ونقاء خيالي للمكالمات الطويلة والألعاب." },
+            { id: 6, name: "شاحن سامسونج الأصلي السريع 45W", price: 35000, image: "https://images.unsplash.com/photo-1622445262465-2481c4574875?auto=format&fit=crop&w=300&q=80", brand: "samsung", desc: "شحن فائق السرعة ومحمي ضد التردد والحرارة العالية." }
+        ];
+
+        let cart = [];
+
+        function displayProducts(items) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            items.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "product-card bg-white border border-gray-100 rounded-2xl p-2.5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="w-full h-32 bg-gray-50 rounded-xl overflow-hidden relative mb-2">
+                            <img src="${product.image}" class="w-full h-full object-cover" alt="${product.name}">
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800 line-clamp-1">${product.name}</h4>
+                        <p class="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight font-medium">${product.desc}</p>
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-gray-50 flex items-center justify-between">
+                        <span class="text-xs font-black text-red-600">${product.price.toLocaleString()} د.ع</span>
+                        <button onclick="addToCart(${product.id})" class="w-7 h-7 bg-red-50 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterBrand(brand, button) {
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.className = "brand-btn bg-white text-gray-600 border border-gray-100 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5";
+            });
+            
+            if(brand === 'all') {
+                button.className = "brand-btn active bg-red-600 text-white border border-red-600 px-5 py-2 rounded-xl text-xs font-bold shadow-md whitespace-nowrap";
+                displayProducts(products);
+            } else {
+                button.className = "brand-btn active bg-red-600 text-white border border-red-600 px-4 py-2 rounded-xl text-xs font-bold shadow-md whitespace-nowrap flex items-center gap-1.5";
+                const filtered = products.filter(p => p.brand === brand);
+                displayProducts(filtered);
+            }
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-text').innerText = text;
+            toast.style.transform = "translateY(0)";
+            setTimeout(() => { toast.style.transform = "translateY(-150%)"; }, 2500);
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const exist = cart.find(item => item.id === id);
+            
+            if(exist) { exist.qty++; } else { cart.push({ ...product, qty: 1 }); }
+            
+            updateCartUI();
+            showToast(`تمت إضافة "${product.name}" إلى السلة!`);
+            
+            const icon = document.getElementById('cart-icon-nav');
+            icon.classList.add('animate-cart');
+            setTimeout(() => icon.classList.remove('animate-cart'), 300);
+        }
+
+        function changeQty(id, amt) {
+            const item = cart.find(i => i.id === id);
+            if(item) {
+                item.qty += amt;
+                if(item.qty <= 0) { cart = cart.filter(i => i.id !== id); }
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const container = document.getElementById('cart-items-container');
+            const summary = document.getElementById('cart-summary-card');
+            const empty = document.getElementById('cart-empty-state');
+            
+            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+            
+            if(totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.classList.remove('hidden');
+                summary.classList.remove('hidden');
+                empty.classList.add('hidden');
+            } else {
+                badge.classList.add('hidden');
+                summary.classList.add('hidden');
+                empty.classList.remove('hidden');
+            }
+
+            container.innerHTML = '';
+            let totalPrice = 0;
+
+            cart.forEach(item => {
+                totalPrice += (item.price * item.qty);
+                const row = document.createElement('div');
+                row.className = "bg-white border border-gray-100 rounded-xl p-2.5 flex items-center justify-between gap-3 shadow-sm";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 flex-1">
+                        <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover bg-gray-50">
+                        <div class="space-y-0.5">
+                            <h5 class="text-xs font-bold text-gray-800 line-clamp-1">${item.name}</h5>
+                            <span class="text-[11px] font-black text-red-600 block">${(item.price * item.qty).toLocaleString()} د.ع</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-100 gap-2">
+                        <button onclick="changeQty(${item.id}, -1)" class="w-5 h-5 bg-white border border-gray-100 rounded flex items-center justify-center text-xs font-bold text-gray-600">-</button>
+                        <span class="text-xs font-bold text-gray-800 w-4 text-center">${item.qty}</span>
+                        <button onclick="changeQty(${item.id}, 1)" class="w-5 h-5 bg-white border border-gray-100 rounded flex items-center justify-center text-xs font-bold text-gray-600">+</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('cart-total-price').innerText = `${totalPrice.toLocaleString()} د.ع`;
+        }
+
+        function toggleCartPage() {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-cart').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function goBackToHome() {
+            document.getElementById('page-cart').classList.add('hidden');
+            document.getElementById('page-home').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function sendOrderWhatsApp() {
+            const name = document.getElementById('customer-name').value.trim();
+            const address = document.getElementById('customer-address').value.trim();
+
+            if(!name || !address) {
+                showToast("يرجى ملء الاسم والعنوان أولاً لإرسال الطلب!");
+                return;
+            }
+
+            let orderText = `*طلب شراء جديد من تطبيق سلام فون* 📱%0A%0A`;
+            orderText += `*الزبون:* ${name}%0A`;
+            orderText += `*العنوان:* ${address}%0A`;
+            orderText += `------------------------%0A`;
+
+            cart.forEach((item, index) => {
+                orderText += `${index + 1}. *${item.name}* %0A   الكمية: ${item.qty} | السعر: ${(item.price * item.qty).toLocaleString()} د.ع%0A`;
+            });
+
+            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            orderText += `------------------------%0A`;
+            orderText += `*المجموع الكلي:* ${total.toLocaleString()} د.ع`;
+
+            // ضع هنا رقم الواتساب الخاص بك بدلاً من الأصفار لتستلم الرسالة مباشرة
+            const myPhoneNumber = "9647800000000"; 
+            window.open(`https://wa.me/${myPhoneNumber}?text=${orderText}`, '_blank');
+        }
+
+        displayProducts(products);
+    </script>
+</body>
+</html>
 
